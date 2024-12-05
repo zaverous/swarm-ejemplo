@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Login.css';
 import assets from '../../assets/assets';
 import { useNavigate } from 'react-router-dom';
+import api from '../../api'
 
 const Login = () => {
   const [currState, setCurrState] = useState('Sign up');
@@ -17,9 +18,30 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const endpoint = currState === 'Sign up' ? '/register' : '/login';
+    const endpoint = currState === 'Sign up' ? '/api/users/register' : '/api/users/login';
 
     try {
+      const response = await api.post(endpoint,formData); //Usamos api.js para hacer la solicitud 
+
+      if(response.status === 200){
+        const data = response.data; 
+
+        if (currState === 'Login'){
+          localStorage.setItem('token', data.token); //Guardamos el token en localstorage
+          alert('Inicio de sesión exitoso'); 
+          navigate('/chat'); 
+        } else{
+          alert('Registro exitoso. Ahora puedes iniciar sesión'); 
+          setCurrState('Login'); 
+        }
+      } else {
+        alert(response.data.error || 'Ocurrió un error'); 
+      }
+    } catch(error){
+      console.error('Error al enviar el formulario: ', error); 
+      alert('Error al conectar con el servidor'); 
+    }
+    /*try {
       const response = await fetch(`http://localhost:3001${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,7 +65,7 @@ const Login = () => {
     } catch (error) {
       console.error('Error al enviar el formulario:', error);
       alert('Error al conectar con el servidor.');
-    }
+    }*/
   };
 
   return (

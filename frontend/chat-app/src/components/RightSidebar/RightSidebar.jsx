@@ -1,6 +1,6 @@
 import React from "react";
-import '/home/adrian-cimsi/CIMSI/frontend/chat-app/src/components/RightSidebar/RightSidebar.css'
-import assets from "/home/adrian-cimsi/CIMSI/frontend/chat-app/src/assets/assets";
+import './RightSidebar.css';
+import assets from "../../assets/assets";
 
 const RightSidebar = () => {
     return (
