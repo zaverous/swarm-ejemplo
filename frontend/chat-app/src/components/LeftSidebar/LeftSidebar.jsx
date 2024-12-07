@@ -2,31 +2,38 @@ import React, { useState, useEffect } from "react";
 import "./LeftSidebar.css";
 import assets from "../../assets/assets";
 import { useNavigate } from "react-router-dom";
+import api from '../../api'
 
-const LeftSidebar = () => {
+/* const LeftSidebar = () => {
   const [chats, setChats] = useState([]);
   const [users, setUsers] = useState({});
   const [search, setSearch] = useState("");
-  const navigate = useNavigate();
+  const navigate = useNavigate(); */
+
+  const LeftSidebar = ({ setActiveChatId }) => {
+    const [chats, setChats] = useState([]);
+    const navigate = useNavigate();
+    const [search, setSearch] = useState(""); // Inicializa la variable search
+
 
   useEffect(() => {
-    const fetchChatsAndUsers = async () => {
+    // const fetchChatsAndUsers = async () => {
+      const fetchChats = async () => {
       try {
         const token = localStorage.getItem("token");
-        const chatsResponse = await fetch("http://localhost:3001/chats", {
+        const response = await api.get("/api/Chats", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (chatsResponse.ok) {
-          const chatsData = await chatsResponse.json();
-          setChats(chatsData);
+        if (response.status === 200) {
+          setChats(response.data);
 
-          // Obtener detalles de los usuarios únicos de los chats
+          /* // Obtener detalles de los usuarios únicos de los chats
           const userIds = [
             ...new Set(chatsData.flatMap((chat) => chat.members)),
           ];
           const usersResponse = await fetch(
-            "http://localhost:3001/users/details",
+            "http://localhost:3001/api/Users/details",
             {
               method: "POST",
               headers: {
@@ -44,7 +51,7 @@ const LeftSidebar = () => {
               return acc;
             }, {});
             setUsers(usersMap);
-          }
+          } */
         } else {
           console.error("Error al cargar los chats");
         }
@@ -53,7 +60,7 @@ const LeftSidebar = () => {
       }
     };
 
-    fetchChatsAndUsers();
+    fetchChats();
   }, []);
 
   const filteredChats = chats.filter((chat) => {

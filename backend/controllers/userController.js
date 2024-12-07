@@ -99,6 +99,7 @@ async function ensureDBConnected() {
 
 // Controlador de registro de usuario
 async function registerUser(req, res) {
+  console.log("Datos recibidos en el registro:", req.body);
   try {
     await ensureDBConnected(); // Asegurar conexión
     const db = mongoose.connection.db; // Ahora debería estar conectado
@@ -106,13 +107,13 @@ async function registerUser(req, res) {
     const { username, email, password } = req.body;
 
     // Comprobar si el email ya está registrado
-    const existingUser = await db.collection('users').findOne({ email });
+    const existingUser = await db.collection('Users').findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: 'El email ya está registrado' });
     }
 
     // Insertar el nuevo usuario con los datos proporcionados
-    await db.collection('users').insertOne({ 
+    await db.collection('Users').insertOne({ 
       _id: new mongoose.Types.ObjectId(), // Genera un ID único
       username, 
       email, 
@@ -139,7 +140,7 @@ const loginUser = async (req, res) => {
 
   try {
     // Buscar usuario en la base de datos
-    const user = await db.collection('users').findOne({ username });
+    const user = await db.collection('Users').findOne({ username });
     if (!user || user.password !== password) {
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }

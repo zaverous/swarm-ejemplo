@@ -2,28 +2,29 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "./ChatBox.css";
 import assets from "../../assets/assets";
+import api from '../../api'
 
-const ChatBox = () => {
+/* const ChatBox = () => {
   const { chatId } = useParams(); // Obtener chatId desde la URL
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState(""); */
+
+const ChatBox = ({ activeChatId }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
     const fetchMessages = async () => {
-      if (!chatId) {
-        console.error("chatId no definido");
-        return;
-      }
+      if (!activeChatId) return; //No cargar mensajes si no hay Chat seleccionado
 
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`http://localhost:3001/messages/${chatId}`, {
+        const response = await api.get(`/api/Messages/${activeChatId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          setMessages(data);
+        if (response.status === 200) {
+          setMessages(response.data);
         } else {
           console.error("Error al cargar los mensajes");
         }
@@ -33,25 +34,22 @@ const ChatBox = () => {
     };
 
     fetchMessages();
-  }, [chatId]);
+  }, [activeChatId]);
 
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3001/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ chatId, content: newMessage }),
+      const response = await api.get("/api/Messages", {
+        chatId: activeChatId,
+        content: newMessage,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (response.ok) {
-        const message = await response.json();
-        setMessages((prevMessages) => [...prevMessages, message]);
+      if (response.status === 201) {
+        setMessages((prevMessages) => [...prevMessages, response.data]);
         setNewMessage("");
       } else {
         console.error("Error al enviar el mensaje");
@@ -60,6 +58,16 @@ const ChatBox = () => {
       console.error("Error de conexión:", error);
     }
   };
+
+  if (!activeChatId) {
+    return (
+      <div className="chat-box">
+        <div className="no-chat">
+          <p>Selecciona un chat para empezar a conversar</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="chat-box">

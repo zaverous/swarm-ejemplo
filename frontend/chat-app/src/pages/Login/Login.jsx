@@ -18,25 +18,34 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const endpoint = currState === 'Sign up' ? '/api/users/register' : '/api/users/login';
+   
+    // Validación básica
+    if (!formData.username || !formData.password || (currState === 'Sign up' && !formData.email)) {
+       alert('Todos los campos son obligatorios');
+       return;
+  }
+ 
+    const endpoint = currState === 'Sign up' ? '/api/Users/register' : '/api/Users/login';
+    console.log("Datos enviados desde el formulario:", formData);
 
     try {
+   
       const response = await api.post(endpoint,formData); //Usamos api.js para hacer la solicitud 
 
-      if(response.status === 200){
-        const data = response.data; 
-
-        if (currState === 'Login'){
-          localStorage.setItem('token', data.token); //Guardamos el token en localstorage
-          alert('Inicio de sesión exitoso'); 
-          navigate('/chat'); 
-        } else{
-          alert('Registro exitoso. Ahora puedes iniciar sesión'); 
-          setCurrState('Login'); 
+    if (response.status === 200 || response.status === 201) {
+        const data = response.data;
+        if (currState === 'Login') {
+           localStorage.setItem('token', data.token);
+           alert('Inicio de sesión exitoso');
+           navigate('/../Chat');
+        } else {
+           alert('Registro exitoso. Ahora puedes iniciar sesión');
+           setCurrState('Login');
         }
-      } else {
-        alert(response.data.error || 'Ocurrió un error'); 
-      }
+    } else {
+        alert(response.data.error || 'Ocurrió un error inesperado');
+    }
+
     } catch(error){
       console.error('Error al enviar el formulario: ', error); 
       alert('Error al conectar con el servidor'); 

@@ -27,13 +27,20 @@ app.get('/', (req, res) => {
 });
 
 connectDB().then(() => {
+  console.log("Conexión establecida, iniciando el servidor...");
   // Solo arrancar el servidor después de que la conexión a MongoDB sea exitosa
-  app.use(cors());
+  const cors = require('cors');
+  app.use(cors({
+    origin: 'http://localhost:5173', // Dirección del frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
+    allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
+    credentials: true // Si necesitas enviar cookies o encabezados de autorización
+  }));
   app.use(express.json());
 
   // Rutas
-  app.use('/api/users', userRoutes);
-  app.use('/api/chats', chatRoutes);
+  app.use('/api/Users', userRoutes);
+  app.use('/api/Chats', chatRoutes);
 
   // Configuración de Socket.IO
   setupSocket(io);
@@ -42,6 +49,11 @@ connectDB().then(() => {
   server.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
   });
+
+  app.use((req, res, next) => {
+    console.log('Estado de la conexión:', mongoose.connection.readyState);
+    next();
+  });  
 
   const adminRoutes = require('./routes/adminRoutes');
   app.use('/admin', adminRoutes); // Ahora las rutas estarán bajo '/admin'
