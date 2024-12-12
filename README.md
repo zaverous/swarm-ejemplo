@@ -78,21 +78,15 @@ ip publica : 135.236.97.129
 
 Dado que los servicios están en una red interna (por ejemplo, `10.1.0.4`), es necesario crear un túnel SSH para acceder a ellos desde tu máquina local.
 
-1.  **Configurar el túnel SSH para el frontend**: Ejecuta el siguiente comando en tu máquina local:
+1.  **Configurar el túnel SSH para el frontend y el backend***: Ejecuta el siguiente comando en tu máquina local:
     
     ```php-template
-    ssh -L 8084:10.1.0.4:3000 <usuario>@<IP-pública-del-nodo-maestro>
-    ```
-    
-2.  **Configurar el túnel SSH para el backend**: Ejecuta el siguiente comando en tu máquina local:
-    
-    ```php-template
-    ssh -L 8085:10.1.0.4:5000 <usuario>@<IP-pública-del-nodo-maestro>
+    ssh -L 8084:10.1.0.4:3000 8085:10.1.0.4:5000 <usuario>@<IP-pública-del-nodo-maestro>
     ```
     
     **⚠ Advertencia**: Esto solo funcionará si el puerto 8085 está configurado para el backend porque está codificado en el archivo de la aplicación frontend.
     
-3.  Mantén ambos túneles abiertos mientras accedes a la aplicación.
+2.  Mantén ambos túneles abiertos mientras accedes a la aplicación.
     
 
 * * *
