@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: myapp-frontend
+    ports:
+      - "3000:3000" # Expose frontend on port 3000
+    environment:
+      - BACKEND_URL=http://localhost:8085 # Internal service DNS
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - backend
+
+  backend:
+    image: myapp-backend
+    ports:
+      - "5000:5000" # Expose backend on port 5000
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
