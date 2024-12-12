@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
 
 // Proxy request to backend
 app.get('/api/test', (req, res) => {
-  const backendUrl = 'http://localhost:808';
+  const backendUrl = process.env.BACKEND_URL || 'http://backend:5000';
   res.redirect(`${backendUrl}/api`);
 });
 
