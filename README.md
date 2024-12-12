@@ -68,8 +68,11 @@ Capítulo 1: Configuración de Docker Swarm y Despliegue de Aplicaciones
 
 * * *
 
-Capítulo 2: Acceso a la Aplicación
+Capítulo 2: Acceso a la Aplicación hecha en maquina virtual de azure
 ----------------------------------
+Usuario : cimsi
+contrasena : Cimsi24252425
+ip publica : 135.236.97.129
 
 ### Paso 1: Crear un Túnel SSH para los Servicios
 
