@@ -50,31 +50,6 @@ const Login = () => {
       console.error('Error al enviar el formulario: ', error); 
       alert('Error al conectar con el servidor'); 
     }
-    /*try {
-      const response = await fetch(`http://localhost:3001${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        if (currState === 'Login') {
-          localStorage.setItem('token', data.token);
-          alert('Inicio de sesión exitoso');
-          navigate('/chat');
-        } else {
-          alert('Registro exitoso. Ahora puedes iniciar sesión.');
-          setCurrState('Login');
-        }
-      } else {
-        alert(data.error || 'Ocurrió un error.');
-      }
-    } catch (error) {
-      console.error('Error al enviar el formulario:', error);
-      alert('Error al conectar con el servidor.');
-    }*/
   };
 
   return (

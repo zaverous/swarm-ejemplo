@@ -7,6 +7,7 @@ const { connectDB } = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const setupSocket = require('./socket');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
@@ -37,7 +38,6 @@ connectDB().then(() => {
     credentials: true // Si necesitas enviar cookies o encabezados de autorización
   }));
   app.use(express.json());
-
   // Rutas
   app.use('/api/Users', userRoutes);
   app.use('/api/Chats', chatRoutes);

@@ -1,59 +1,67 @@
 const mongoose = require('../config/db');
+const Chat = require('../models/chatModel');  // Asegúrate de tener el modelo Chat configurado correctamente
+const Message = require('../models/messageModel');  // Asegúrate de importar el modelo Message
 
-/* const getChats = async (req, res) => {
-  const db = mongoose.connection.db;
-  try {
-    const chats = await db.collection('Chats').find({ members: req.user.id }).toArray();
-    res.status(200).json(chats);
-  } catch (error) {
-    console.error('Error en getChats:', error);
-    res.status(500).json({ error: 'Error al cargar chats' });
-  }
-}; */
-
+// Obtener los chats de un usuario
 const getChats = async (req, res) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      console.error('No conectado a MongoDB');
-      return res.status(500).json({ error: 'No conectado a MongoDB' });
-    }
+    // Obtener los chats donde el usuario es miembro, poblamos los mensajes de cada chat
+    const chats = await Chat.find({ members: req.user.id })
+      .populate('messages')  // Poblamos los mensajes del chat
+      .populate('members', 'username avatar')  // Poblamos los miembros del chat (solo campos relevantes)
+      .sort({ createdAt: -1 });  // Ordenamos los chats por fecha de creación (más reciente primero)
 
-    const db = mongoose.connection.db;
-    const chats = await db.collection('Chats').find({ members: req.user.id }).toArray();
     res.status(200).json(chats);
   } catch (error) {
-    console.error('Error en getChats:', error.message);
-    res.status(500).json({ error: 'Error al cargar chats' });
+    console.error("Error al obtener los chats:", error);
+    res.status(500).json({ message: "Error al obtener los chats" });
   }
 };
 
-
+// Enviar un mensaje
 const sendMessage = async (req, res) => {
-  const { chatId, content } = req.body;
-  const db = mongoose.connection.db;
-
+  const { chatId, content, mediaUrl, mediaType } = req.body;
+  
   try {
-    const message = {
+    // Creamos el nuevo mensaje en la base de datos
+    const message = new Message({
       chatId: new mongoose.Types.ObjectId(chatId),
-      sender: new mongoose.Types.ObjectId(req.user.id),
+      sender: req.user._id,
       content,
+      mediaUrl,
+      mediaType,
       createdAt: new Date(),
-    };
+    });
 
-    await db.collection('Messages').insertOne(message);
+    // Guardamos el mensaje
+    await message.save();
+
+    // Actualizamos el chat agregando el nuevo mensaje
+    const chat = await Chat.findById(chatId);
+    chat.messages.push(message._id);
+    await chat.save();
+
     res.status(201).json(message);
   } catch (error) {
-    res.status(500).json({ error: 'Error al enviar mensaje' });
+    console.error("Error al enviar mensaje:", error);
+    res.status(500).json({ message: "Error al enviar mensaje" });
   }
 };
 
+// Obtener los mensajes de un chat específico
 const getMessages = async (req, res) => {
-  const db = mongoose.connection.db;
+  const { chatId } = req.params;
+  
   try {
-    const messages = await db.collection('Messages').find({ chatId: new mongoose.Types.ObjectId(req.params.chatId) }).toArray();
+    // Obtener los mensajes de un chat específico, poblamos el sender
+    const messages = await Message.find({ chatId })
+      .populate('sender', 'username avatar')  // Poblamos los datos del usuario que envió el mensaje
+      .sort({ createdAt: 1 });  // Ordenamos los mensajes de más antiguo a más reciente
+
     res.status(200).json(messages);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener mensajes' });
+    console.error("Error al obtener los mensajes:", error);
+    res.status(500).json({ message: "Error al obtener los mensajes" });
   }
 };
 

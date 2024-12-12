@@ -1,40 +1,32 @@
-/* const jwt = require('jsonwebtoken');
-const SECRET_KEY = 'secret123';
-
-const authenticate = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Acceso denegado' });
-
-  try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(401).json({ error: 'Token inválido o expirado' });
-  }
-};
-
-module.exports = authenticate;
- */
-
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'secret123';
 
 const authenticate = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Extraer el token del encabezado
-  console.log('Token recibido:', token);
+  // Comprobamos si el encabezado de la solicitud contiene el token
+  const token = req.headers.authorization?.split(' ')[1]; 
+  //console.log('Token recibido:', token);
+
+  // Si no hay token en los encabezados, devolvemos un error
   if (!token) {
+    console.log('No se encontró el token');
     return res.status(401).json({ error: 'Acceso denegado' }); // Sin token
   }
 
   try {
-    const decoded = jwt.verify(token, SECRET_KEY); // Verificar el token
-    console.log('Token decodificado:', decoded);
-    req.user = decoded; // Guardar el usuario decodificado en la solicitud
-    next(); // Pasar al siguiente middleware
+    // Intentamos verificar y decodificar el token
+    const decoded = jwt.verify(token, SECRET_KEY);
+    //console.log('Token decodificado:', decoded); // Log del contenido del token decodificado
+
+    // Asignamos el usuario decodificado a req.user
+    req.user = decoded;
+    //console.log('Usuario asignado a req.user:', req.user); // Log del usuario asignado
+
+    // Pasamos al siguiente middleware
+    next();
   } catch (error) {
+    // Si ocurre un error al verificar el token, lo mostramos
     console.error('Error al verificar el token:', error);
-    res.status(401).json({ error: 'Token inválido o expirado' }); // Token no válido
+    return res.status(401).json({ error: 'Token inválido o expirado' }); // Token no válido
   }
 };
 
