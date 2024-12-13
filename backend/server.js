@@ -14,7 +14,8 @@ const io = new Server(server, {
     origin: 'http://135.236.97.129', // Allow requests from your frontend
     methods: ['GET', 'POST'],
     credentials: true
-  }
+  },
+  transport: ['websocket'] //Force Websocket as the only transport
 });
 
 
