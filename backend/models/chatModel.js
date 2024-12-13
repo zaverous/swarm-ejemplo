@@ -7,7 +7,9 @@ const chatSchema = new mongoose.Schema({
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   admin: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   createdAt: { type: Date, default: Date.now },
-  messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }]
+  messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }],
+  lastMessage: [{ type: String, required: false}],
+  lastMessageSender: [{ type: String, required: false}]
 });
 
 
