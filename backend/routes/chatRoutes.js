@@ -1,5 +1,5 @@
 const express = require('express');
-const { sendMessage, getMessages } = require('../controllers/chatController');
+const { sendMessage, getMessages } = require('../controllers/messagesController');
 const authenticate = require('../middleware/authenticate');
 const { getUserChats } = require('../controllers/userController');
 const Chat = require('../models/chatModel');

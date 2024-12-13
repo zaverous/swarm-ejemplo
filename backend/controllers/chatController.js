@@ -1,6 +1,6 @@
 const mongoose = require('../config/db');
 const Chat = require('../models/chatModel');  // Asegúrate de tener el modelo Chat configurado correctamente
-const Message = require('../models/messageModel');  // Asegúrate de importar el modelo Message
+//const Message = require('../models/messageModel');  // Asegúrate de importar el modelo Message
 
 // Obtener los chats de un usuario
 const getChats = async (req, res) => {

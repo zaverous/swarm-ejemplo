@@ -34,8 +34,8 @@ connectDB().then(() => {
   app.use(cors({
     origin: 'http://localhost:5173', // Dirección del frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
-    allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
-    credentials: false // Si necesitas enviar cookies o encabezados de autorización
+    allowedHeaders: ['Content-Type', 'Authorization', 'method'], // Encabezados permitidos
+    credentials: true // Si necesitas enviar cookies o encabezados de autorización
   }));
   app.use(express.json());
   // Rutas
