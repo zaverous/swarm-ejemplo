@@ -3,15 +3,30 @@ const Chat = require('../models/chatModel');  // Asegúrate de tener el modelo C
 const Message = require('../models/messageModel');  // Asegúrate de importar el modelo Message
 
 // Obtener los chats de un usuario
+
 const getChats = async (req, res) => {
   try {
-    // Obtener los chats donde el usuario es miembro, poblamos los mensajes de cada chat
-    const chats = await Chat.find({ members: req.user.id })
-      .populate('messages')  // Poblamos los mensajes del chat
-      .populate('members', 'username avatar')  // Poblamos los miembros del chat (solo campos relevantes)
-      .sort({ createdAt: -1 });  // Ordenamos los chats por fecha de creación (más reciente primero)
+  await ensureDBConnected(); // Asegurar conexión
+  // Obtener los chats donde el usuario es miembro, poblamos los mensajes de cada chat
+  const chats = await Chat.find({ members: req.user.id })
+  .populate('messages')                                                           // Poblamos los mensajes del chat
+  .sort({ createdAt: -1 })
+  ;   
 
-    res.status(200).json(chats);
+  for (let chat of chats){
+    const chatId2 = new mongoose.Types.ObjectId(String (chat.id));
+
+    //CAMBIO DE LUISA
+    const lastMessage = await Message.findOne({ chatId: chatId2 })
+    .populate('sender', 'username avatar');
+    if(lastMessage){
+      chat.lastMessage = lastMessage.content;
+      chat.lastMessageSender = lastMessage.sender.username;
+    }else{
+      chat.lastMessage = null;
+      chat.lastMessageSender = null;}
+  }
+  res.status(200).json(chats);
   } catch (error) {
     console.error("Error al obtener los chats:", error);
     res.status(500).json({ message: "Error al obtener los chats" });
