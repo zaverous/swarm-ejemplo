@@ -6,6 +6,8 @@ const authenticate = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1]; 
   //console.log('Token recibido:', token);
 
+  //app.options("*", cors());
+
   // Si no hay token en los encabezados, devolvemos un error
   if (!token) {
     console.log('No se encontró el token');
