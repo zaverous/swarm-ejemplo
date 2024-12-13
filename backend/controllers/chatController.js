@@ -1,15 +1,24 @@
-const mongoose = require('../config/db');
+const { mongoose } = require('../config/db');
 const Chat = require('../models/chatModel');  // Asegúrate de tener el modelo Chat configurado correctamente
 const Message = require('../models/messageModel');  // Asegúrate de importar el modelo Message
 
 // Obtener los chats de un usuario
+// Función auxiliar para asegurar que la conexión esté lista
+async function ensureDBConnected() {
+  if (mongoose.connection.readyState !== 1) {
+    console.log('Esperando conexión a la base de datos...');
+    await new Promise((resolve) => {
+      mongoose.connection.once('connected', resolve); // Espera el evento 'connected'
+    });
+  }
+}
+
 
 const getChats = async (req, res) => {
   try {
-  await ensureDBConnected(); // Asegurar conexión
-  // Obtener los chats donde el usuario es miembro, poblamos los mensajes de cada chat
+  await ensureDBConnected();
   const chats = await Chat.find({ members: req.user.id })
-  .populate('messages')                                                           // Poblamos los mensajes del chat
+  .populate('messages')
   .sort({ createdAt: -1 })
   ;   
 

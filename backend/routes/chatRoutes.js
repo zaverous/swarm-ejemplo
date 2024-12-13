@@ -1,5 +1,5 @@
 const express = require('express');
-const { sendMessage, getMessages } = require('../controllers/chatController');
+const { sendMessage, getMessages, getChats } = require('../controllers/chatController');
 const authenticate = require('../middleware/authenticate');
 const { getUserChats } = require('../controllers/userController');
 const Chat = require('../models/chatModel');
@@ -7,7 +7,7 @@ const Message = require('../models/messageModel');
 const router = express.Router();
 
 // Obtener los chats de un usuario
-router.get('/', authenticate, async (req, res) => {
+router.get('/', authenticate, getChats, async (req, res) => {
 
   router.get('/Messages', authenticate, getMessages);
 
