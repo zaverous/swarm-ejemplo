@@ -10,7 +10,9 @@ app.get('/', (req, res) => {
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
       // Connect to the backend
-      const socket = io('http://135.236.97.129:5000');
+      const socket = io('http://135.236.97.129', {
+		transports: ['websocket'], // Force WebSocket transport
+	});
 
       // Listen for messages
       socket.on('message', (msg) => {

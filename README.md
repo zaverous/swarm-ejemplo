@@ -60,20 +60,30 @@ Configuración de Nginx
         listen 80;
         server_name <ip-publica>;
     
-        # Proxy para el backend
-        location /api/ {
-            proxy_pass http://10.1.0.4:5000; # Dirección privada del backend
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-            proxy_set_header Host $host;
-        }
     
         # Proxy para el frontend
         location / {
             proxy_pass http://10.1.0.4:3000; # Dirección privada del frontend
             proxy_http_version 1.1;
             proxy_set_header Host $host;
+        }
+
+        # proxy to the backend
+        location /api/ {
+            proxy_pass http://10.1.0.4:5000; # Backend server
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+        }
+
+        location /socket.io/ {
+            proxy_pass http://10.1.0.4:5000;  # Backend server
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
         }
     }
     ```
