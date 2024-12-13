@@ -27,7 +27,8 @@ const getChats = async (req, res) => {
 
     //CAMBIO DE LUISA
     const lastMessage = await Message.findOne({ chatId: chatId2 })
-    .populate('sender', 'username avatar');
+    .populate('sender', 'username avatar')
+    .sort({createdAt: -1});
     if(lastMessage){
       chat.lastMessage = lastMessage.content;
       chat.lastMessageSender = lastMessage.sender.username;
@@ -41,61 +42,5 @@ const getChats = async (req, res) => {
     res.status(500).json({ message: "Error al obtener los chats" });
   }
 };
-
-// Enviar un mensaje
-/* const sendMessage = async (req, res) => {
-  const { chatId, content, mediaUrl, mediaType } = req.body;
-  
-  try {
-    // Creamos el nuevo mensaje en la base de datos
-    const message = new Message({
-      chatId: new mongoose.Types.ObjectId(chatId),
-      sender: req.user._id,
-      content,
-      mediaUrl,
-      mediaType,
-      createdAt: new Date(),
-    });
-
-    // Guardamos el mensaje
-    await message.save();
-
-    // Actualizamos el chat agregando el nuevo mensaje
-    const chat = await Chat.findById(chatId);
-    chat.messages.push(message._id);
-    await chat.save();
-
-    res.status(201).json(message);
-  } catch (error) {
-    console.error("Error al enviar mensaje:", error);
-    res.status(500).json({ message: "Error al enviar mensaje" });
-  }
-}; */
-
-/* const getMessages = async (req, res) => {
-  const { chatId } = req.query; // Usamos req.query en lugar de req.params
-
-  console.log("chatId recibido:", chatId);
-
-  try {
-    if (!chatId) {
-      return res.status(400).json({ message: "Se requiere un chatId para obtener mensajes" });
-    }
-
-    // Filtrar mensajes por el campo chatId
-    const messages = await Message.find({ chatId })
-      .populate('sender', 'username avatar') // Poblar datos del remitente
-      .sort({ createdAt: 1 }); // Ordenar de más antiguo a más reciente
-    
-      console.log("Mensajes encontrados:", messages);
-
-    res.status(200).json(messages);
-  } catch (error) {
-    console.error("Error al obtener los mensajes:", error);
-    res.status(500).json({ message: "Error al obtener los mensajes" });
-  }
-}; */
-
-
 
 module.exports = { getChats};//, sendMessage, getMessages };

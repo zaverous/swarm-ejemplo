@@ -11,7 +11,7 @@ const getMessages = async (req, res) => {
     // Buscar mensajes relacionados con el chatId
     const messages = await Message.find({ chatId })
       .populate('sender', 'username avatar') // Poblamos el remitente con campos relevantes
-      .sort({ createdAt: 1 }); // Ordenar por fecha de creación
+      .sort({ createdAt: -1 }); // Ordenar por fecha de creación
 
     console.log("Mensajes encontrados:", messages);
     res.status(200).json(messages);
@@ -40,12 +40,11 @@ const sendMessage = async (req, res) => {
     // Guardar el mensaje en la base de datos
     await message.save();
 
-    // Actualizar el chat para incluir el nuevo mensaje
+    const populatedMessage = await message.populate("sender", "username avatar"); // Poblamos los detalles del usuario
+
     const chat = await Chat.findById(chatId);
-    if (chat) {
-      chat.messages.push(message._id);
-      await chat.save();
-    }
+    chat.messages.push(message._id);
+    await chat.save();
 
     console.log("Mensaje enviado:", message);
     res.status(201).json(message);

@@ -15,7 +15,7 @@ router.get('/', authenticate, getChats, async (req, res) => {
     // Obtener los chats del usuario y sus mensajes
     const chats = await Chat.find({ members: req.user.id })
       .populate('messages')  // Poblamos los mensajes del chat
-      .sort({ createdAt: -1 });  // Ordenamos los chats por fecha de creación (más reciente primero)
+      .sort({ createdAt : -1});  // Ordenamos los chats por fecha de creación (más reciente primero)
     console.log("Los chats del usuario "+req.user.id+" son... ",chats);
     const individualChats = chats.filter(chat => !chat.isGroup);
     const groupChats = chats.filter(chat => chat.isGroup);

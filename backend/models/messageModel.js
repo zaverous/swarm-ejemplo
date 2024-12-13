@@ -10,6 +10,13 @@ const messageSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+messageSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    delete ret.__v; // Eliminar el campo __v al convertir a JSON
+    return ret;
+  },
+});
+
 const Message = mongoose.model('Message', messageSchema, 'Messages');
 module.exports = Message;
 
