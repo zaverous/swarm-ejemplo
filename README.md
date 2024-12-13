@@ -1,122 +1,127 @@
-Guía de Configuración y Acceso a la Aplicación en Docker Swarm
-==============================================================
+Implementación de Frontend y Backend con Nginx y Socket.IO
+==========================================================
 
-Capítulo 1: Configuración de Docker Swarm y Despliegue de Aplicaciones
-----------------------------------------------------------------------
+Este archivo describe los requisitos y pasos para implementar una aplicación que utiliza un **frontend** y un **backend** configurados con **Nginx** y **Socket.IO** para manejar conexiones WebSocket correctamente. Además, se explica cómo acceder a la aplicación desde un navegador utilizando la IP pública.
 
-### Requisitos Previos
+* * *
 
-1.  **Máquinas necesarias**:
-    *   Al menos **3 máquinas** (virtuales o físicas) con Docker instalado.
-    *   Una de las máquinas actuará como **nodo maestro** (manager) y las otras como **nodos trabajadores** (workers).
-2.  **Red**:
-    *   Todas las máquinas deben estar en la misma red y comunicarse entre sí.
-    *   Asegúrate de que los puertos **TCP/UDP 2377, 7946 y 4789** estén abiertos.
+Requisitos
+----------
 
-### Paso 1: Configurar Docker Swarm
-
-1.  **Inicializar el nodo maestro**: En la máquina que será el nodo maestro, ejecuta:
+1.  **Nginx instalado**:
     
-    ```css
-    docker swarm init --advertise-addr <IP-del-nodo-maestro>
-    ```
+    *   Asegúrate de que **Nginx** está instalado en el servidor donde se alojará la aplicación.
+    *   En sistemas basados en Ubuntu/Debian, puedes instalarlo con:
+        
+        ```bash
+        sudo apt update
+        sudo apt install nginx
+        ```
+        
+2.  **Configuración de Socket.IO**:
     
-    *   Esto inicializa el clúster de Docker Swarm y devuelve un comando para que los nodos trabajadores se unan al clúster.
-2.  **Unir los nodos trabajadores**: En las demás máquinas (nodos trabajadores), ejecuta el comando proporcionado por el nodo maestro, que tendrá el siguiente formato:
+    *   En el backend, asegúrate de configurar el middleware de CORS en el servidor de **Socket.IO** para permitir conexiones desde el frontend. El archivo `server.js` debe incluir:
+        
+        ```javascript
+        const io = new Server(server, {
+          cors: {
+            origin: 'http://<ip-publica>',
+            methods: ['GET', 'POST'],
+            credentials: true
+          }
+        });
+        ```
+        
+    *   Sustituye `<ip-publica>` por la IP pública de tu servidor.
+3.  **Configuración del frontend**:
     
-    ```css
-    docker swarm join --token <token-del-swarm> <IP-del-nodo-maestro>:2377
-    ```
-    
-3.  **Verificar el clúster**: En el nodo maestro, ejecuta:
+    *   En el cliente de **Socket.IO**, apunta la conexión al proxy configurado en Nginx:
+        
+        ```javascript
+        const socket = io('http://<ip-publica>');
+        ```
+        
+
+* * *
+
+Configuración de Nginx
+----------------------
+
+1.  Accede al archivo de configuración de Nginx:
     
     ```bash
-    docker node ls
+    sudo nano /etc/nginx/sites-available/default
     ```
     
-    Esto mostrará una lista de nodos en el clúster y sus estados.
+2.  Añade el siguiente bloque de configuración para configurar los proxys para el frontend y el backend:
     
-
-* * *
-
-### Paso 2: Configurar Docker Compose
-
-1.  Crea un archivo `docker-compose.yml` en el nodo maestro. Asegúrate de que defina los servicios necesarios (frontend, backend y base de datos) con sus configuraciones.
+    ```nginx
+    server {
+        listen 80;
+        server_name <ip-publica>;
     
-2.  Asegúrate de que las imágenes Docker para los servicios estén disponibles en un registro accesible por todos los nodos (por ejemplo, Docker Hub).
+        # Proxy para el backend
+        location /api/ {
+            proxy_pass http://10.1.0.4:5000; # Dirección privada del backend
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+        }
     
-
-* * *
-
-### Paso 3: Desplegar la Aplicación con Docker Swarm
-
-1.  Ejecuta el siguiente comando desde el nodo maestro para desplegar el stack de servicios:
-    
-    ```arduino
-    docker stack deploy -c docker-compose.yml <nombre-del-stack>
+        # Proxy para el frontend
+        location / {
+            proxy_pass http://10.1.0.4:3000; # Dirección privada del frontend
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+        }
+    }
     ```
     
-    *   Reemplaza `<nombre-del-stack>` con el nombre que quieras asignar a tu aplicación.
-2.  Verifica el despliegue:
+3.  Guarda los cambios y reinicia Nginx para aplicar la configuración:
     
     ```bash
-    docker service ls
+    sudo systemctl restart nginx
     ```
-    
-    Esto mostrará los servicios desplegados y su estado.
     
 
 * * *
 
-Capítulo 2: Acceso a la Aplicación
-----------------------------------
+Acceso a la Aplicación Hecha en Azure
+----------------------
 
-### Paso 1: Crear un Túnel SSH para los Servicios
 
-Dado que los servicios están en una red interna (por ejemplo, `10.1.0.4`), es necesario crear un túnel SSH para acceder a ellos desde tu máquina local.
+1.  Desde tu navegador, accede a la aplicación usando la **IP pública** del servidor.
+    
+2.  **Frontend**:
+    
+    *   Simplemente abre `http://<ip-publica>` en tu navegador.
+    *   El frontend debe cargarse correctamente.
+3.  **Backend (WebSocket)**:
+    
+    *   Las solicitudes del frontend al backend (`/api/`) se redirigirán automáticamente a través del proxy configurado en Nginx.
 
-1.  **Configurar el túnel SSH para el frontend**: Ejecuta el siguiente comando en tu máquina local:
-    
-    ```php-template
-    ssh -L 8084:10.1.0.4:3000 <usuario>@<IP-pública-del-nodo-maestro>
-    ```
-    
-2.  **Configurar el túnel SSH para el backend**: Ejecuta el siguiente comando en tu máquina local:
-    
-    ```php-template
-    ssh -L 8085:10.1.0.4:5000 <usuario>@<IP-pública-del-nodo-maestro>
-    ```
-    
-    **⚠ Advertencia**: Esto solo funcionará si el puerto 8085 está configurado para el backend porque está codificado en el archivo de la aplicación frontend.
-    
-3.  Mantén ambos túneles abiertos mientras accedes a la aplicación.
-    
+**Por si quiere ver una qu funciona en maquinas de azure accede esta pagina http://135.236.97.129/**
 
 * * *
 
-### Paso 2: Acceder a la Aplicación desde el Navegador
+Notas Adicionales
+-----------------
 
-1.  **Frontend**: Abre tu navegador y accede a:
+*   **Firewall**:
     
-    ```arduino
-    http://localhost:8084
-    ```
+    *   Asegúrate de que el puerto `80` está abierto en el firewall de tu servidor para permitir el tráfico HTTP.
+    *   Si estás usando un firewall como `ufw`, habilítalo con:
+        
+        ```bash
+        sudo ufw allow 80/tcp
+        sudo ufw reload
+        ```
+        
+*   **CORS**:
     
-2.  **Backend (al ser llamado por el frontend)**: El frontend está configurado para llamar al backend a través del túnel SSH en el puerto `8085`. Si el túnel está configurado correctamente, las peticiones al backend funcionarán sin problemas.
-    
+    *   Si el frontend o backend se encuentra en un dominio diferente, asegúrate de actualizar las reglas de CORS en el backend.
 
 * * *
 
-Notas Finales
--------------
-
-*   Asegúrate de que las imágenes Docker estén correctamente configuradas y que los servicios tengan sus puertos abiertos.
-*   Si encuentras problemas de acceso, verifica las reglas de red, los firewalls, y que los túneles SSH estén activos.
-*   Si el backend necesita ser actualizado, realiza los cambios en la imagen Docker correspondiente, sube la nueva imagen al registro, y actualiza el stack con:
-    
-    ```css
-    docker service update --image <nueva-imagen> <nombre-del-servicio>
-    ```
-    
-
-¡Disfruta de tu aplicación desplegada en Docker Swarm!
+Con esta configuración, tu aplicación debería estar accesible desde cualquier navegador utilizando la IP pública del servidor. ¡Buena suerte con la implementación! 😊
