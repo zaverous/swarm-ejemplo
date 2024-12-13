@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   frontend:
-    image: zaverous/myapp-frontend
+    image: zaverous/myapp-frontend:test
     ports:
       - "3000:3000" # Expose frontend on port 3000
     environment:
@@ -15,7 +15,7 @@ services:
       - backend
 
   backend:
-    image: zaverous/myapp-backend
+    image: zaverous/myapp-backend:test
     ports:
       - "5000:5000" # Expose backend on port 5000
     deploy:

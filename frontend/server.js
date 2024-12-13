@@ -5,16 +5,22 @@ const port = 3000;
 // Serve static HTML
 app.get('/', (req, res) => {
   res.send(`
-    <h1>Frontend</h1>
-    <p>This is the frontend. Click below to test the backend connection:</p>
-    <a href="/api/test">Test Backend</a>
-  `);
-});
+    <h1>Frontend with Socket.IO</h1>
+    <p>Open your browser console to see real-time messages.</p>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+      // Connect to the backend
+      const socket = io('http://135.236.97.129:5000');
 
-// Proxy request to backend
-app.get('/api/test', (req, res) => {
-  const backendUrl = process.env.BACKEND_URL || 'http://backend:5000';
-  res.redirect(`${backendUrl}/api`);
+      // Listen for messages
+      socket.on('message', (msg) => {
+        console.log('Message from backend:', msg);
+      });
+
+      // Emit a message
+      socket.emit('message', 'Hello from the frontend!');
+    </script>
+  `);
 });
 
 app.listen(port, () => {

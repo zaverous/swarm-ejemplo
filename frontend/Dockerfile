@@ -1,18 +1,21 @@
 # Use Node.js base image
 FROM node:16
 
-# Create app directory
+# Set working directory
 WORKDIR /usr/src/app
 
-# Copy files
-COPY server.js .
+# Copy package.json and package-lock.json if available
+COPY package*.json ./
 
-# Install express
-RUN npm install express
+# Install dependencies (including socket.io-client)
+RUN npm install socket.io-client express
 
-# Expose port 5000
-EXPOSE 5000
+# Copy frontend source code
+COPY . .
 
-# Start the server
+# Expose the port for the frontend
+EXPOSE 3000
+
+# Start the frontend server
 CMD ["node", "server.js"]
 
