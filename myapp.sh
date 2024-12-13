@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Script que me sirve para actualizar el imagen de frontend y backend en dockerhub
+# y desplegar directamente en el swarm
+
 # Build y psh
 echo "[TASK 1] Build y push imagen de docker frontend"
 docker build -t zaverous/myapp-frontend:test ./frontend/
