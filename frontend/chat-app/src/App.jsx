@@ -4,7 +4,7 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 // Lazy load de las páginas para mejorar el rendimiento
 const Login = lazy(() => import('./pages/Login/Login'));
 const Chat = lazy(() => import('./pages/Chat/Chat'));
-const ProfileUpdate = lazy(() => import('./pages/ProfileUpdate/ProfileUpdate'));
+//const ProfileUpdate = lazy(() => import('./pages/ProfileUpdate/ProfileUpdate'));
 
 // Componente para proteger rutas
 const ProtectedRoute = ({ children }) => {
@@ -13,36 +13,12 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const App = () => {
-  /* return (
-    <Suspense fallback={<div>Cargando...</div>}>
-      <Routes>
-        <Route path="/" element={<Login />} />
-
-        <Route
-          path=":chatId"
-          element={
-            <ProtectedRoute>
-              <Chat />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfileUpdate />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </Suspense>
-  ); */
   return (
     <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="/chat" element={<Chat />} />
-      <Route path="/chat/:chatId" element={<Chat />} /> {/* Ruta con chatId */}
-      <Route path="/profile" element={<ProfileUpdate />} />
+      <Route path="/Chat" element={<Chat />} />
+      <Route path="/Chat/:chatId" element={<Chat />} /> {/* Ruta con chatId */}
+      {/* <Route path="/profile" element={<ProfileUpdate />} /> */}
     </Routes>
   );
 };

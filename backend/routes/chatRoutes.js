@@ -9,10 +9,7 @@ const router = express.Router();
 // Obtener los chats de un usuario
 router.get('/', authenticate, async (req, res) => {
 
-  router.get('/Messages/:chatId', authenticate, getMessages);
-
-  // Ruta para enviar un mensaje
-  router.post('/Messages', authenticate, sendMessage);
+  router.get('/Messages', authenticate, getMessages);
 
   try {
     // Obtener los chats del usuario y sus mensajes

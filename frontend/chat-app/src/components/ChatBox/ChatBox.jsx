@@ -4,12 +4,7 @@ import "./ChatBox.css";
 import assets from "../../assets/assets";
 import api from '../../api'
 
-/* const ChatBox = () => {
-  const { chatId } = useParams(); // Obtener chatId desde la URL
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState(""); */
-
-const ChatBox = ({ activeChatId }) => {
+/* const ChatBox = ({ activeChatId }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
@@ -93,6 +88,66 @@ const ChatBox = ({ activeChatId }) => {
       </div>
     </div>
   );
-};
+}; */
+
+const ChatBox = ({ activeChatId }) => {
+  const [messages, setMessages] = useState([]);
+
+  const fetchMessages = async () => {
+    if (!activeChatId) {
+      console.log("No hay chatId activo.");
+      return;
+    }
+
+    console.log("Cargando mensajes para chatId:", activeChatId);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:3001/api/Messages?chatId=${activeChatId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("Respuesta del servidor:", response.data);
+
+      /* if (response.status === 200) {
+        console.log("Mensajes obtenidos:", response.data);
+        setMessages(response.data);
+      } else {
+        console.error("Error al cargar los mensajes:", response.statusText);
+      } */
+
+        if (Array.isArray(response.data)) {
+          setMessages(response.data);
+        } else {
+          console.error("Respuesta inesperada del servidor:", response.data);
+          setMessages([]);
+        }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+    }
+    };
+
+    useEffect(() => {
+      if (activeChatId) {
+        fetchMessages();
+      }
+    }, [activeChatId]);
+
+    return (
+      <div className="chat-msg">
+        {messages.length > 0 ? (
+          messages.map((message) => (
+            <div key={message._id} className="msg">
+              <p>{message.content}</p>
+            </div>
+          ))
+        ) : (
+          <p>No hay mensajes para este chat.</p>
+        )}
+      </div>
+    );
+
+  };
 
 export default ChatBox;

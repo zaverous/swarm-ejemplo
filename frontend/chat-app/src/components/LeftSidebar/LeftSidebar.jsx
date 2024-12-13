@@ -102,12 +102,12 @@ const LeftSidebar = ({ setActiveChatId }) => { // Recibir setActiveChatId como p
         {filteredChats.length > 0 ? (
           filteredChats.map((chat) => (
             <div
-                key={chat._id}
-                className="friends"
-                onClick={() => {
-                  setActiveChatId(chat._id); // Actualizar el chat activo
-                  navigate(`/chat/${chat._id}`);
-                }}
+              key={chat._id}
+              className="friends"
+              onClick={() => {
+              console.log("Chat seleccionado: ", chat._id);
+              setActiveChatId(chat._id); // Notificar al componente padre
+              }}
               >
               <img
                 src={

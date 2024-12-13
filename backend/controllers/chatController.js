@@ -19,7 +19,7 @@ const getChats = async (req, res) => {
 };
 
 // Enviar un mensaje
-const sendMessage = async (req, res) => {
+/* const sendMessage = async (req, res) => {
   const { chatId, content, mediaUrl, mediaType } = req.body;
   
   try {
@@ -46,17 +46,24 @@ const sendMessage = async (req, res) => {
     console.error("Error al enviar mensaje:", error);
     res.status(500).json({ message: "Error al enviar mensaje" });
   }
-};
+}; */
 
-// Obtener los mensajes de un chat específico
 /* const getMessages = async (req, res) => {
-  const { chatId } = req.params;
-  
+  const { chatId } = req.query; // Usamos req.query en lugar de req.params
+
+  console.log("chatId recibido:", chatId);
+
   try {
-    // Obtener los mensajes de un chat específico, poblamos el sender
+    if (!chatId) {
+      return res.status(400).json({ message: "Se requiere un chatId para obtener mensajes" });
+    }
+
+    // Filtrar mensajes por el campo chatId
     const messages = await Message.find({ chatId })
-      .populate('sender', 'username avatar')  // Poblamos los datos del usuario que envió el mensaje
-      .sort({ createdAt: 1 });  // Ordenamos los mensajes de más antiguo a más reciente
+      .populate('sender', 'username avatar') // Poblar datos del remitente
+      .sort({ createdAt: 1 }); // Ordenar de más antiguo a más reciente
+    
+      console.log("Mensajes encontrados:", messages);
 
     res.status(200).json(messages);
   } catch (error) {
@@ -64,30 +71,7 @@ const sendMessage = async (req, res) => {
     res.status(500).json({ message: "Error al obtener los mensajes" });
   }
 }; */
-const getMessages = async (req, res) => {
-  const { chatId } = req.params; // Asegúrate de que chatId es obtenido de la URL
-  
-  try {
-    // Verificar si el chatId es válido
-    if (!mongoose.Types.ObjectId.isValid(chatId)) {
-      return res.status(400).json({ message: "chatId no válido" });
-    }
-
-    // Obtener los mensajes del chat
-    const messages = await Message.find({ chatId })
-      .populate('sender', 'username avatar') // Poblar datos del remitente
-      .sort({ createdAt: 1 }); // Ordenar por fecha de creación (ascendente)
-
-    if (!messages || messages.length === 0) {
-      return res.status(404).json({ message: "No se encontraron mensajes para este chat" });
-    }
-
-    res.status(200).json(messages);
-  } catch (error) {
-    console.error("Error al obtener los mensajes:", error);
-    res.status(500).json({ message: "Error al obtener los mensajes" });
-  }
-};
 
 
-module.exports = { getChats, sendMessage, getMessages };
+
+module.exports = { getChats};//, sendMessage, getMessages };

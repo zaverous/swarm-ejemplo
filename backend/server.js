@@ -6,6 +6,7 @@ const cors = require('cors');
 const { connectDB } = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const messagesRoutes = require('./routes/messagesRoutes');
 const setupSocket = require('./socket');
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -30,17 +31,17 @@ app.get('/', (req, res) => {
 connectDB().then(() => {
   console.log("Conexión establecida, iniciando el servidor...");
   // Solo arrancar el servidor después de que la conexión a MongoDB sea exitosa
-  const cors = require('cors');
   app.use(cors({
     origin: 'http://localhost:5173', // Dirección del frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
     allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
-    credentials: true // Si necesitas enviar cookies o encabezados de autorización
+    credentials: false // Si necesitas enviar cookies o encabezados de autorización
   }));
   app.use(express.json());
   // Rutas
   app.use('/api/Users', userRoutes);
   app.use('/api/Chats', chatRoutes);
+  app.use('/api/Messages', messagesRoutes);
 
   // Configuración de Socket.IO
   setupSocket(io);
