@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const DB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/chatApp';
+const DB_URI = process.env.MONGODB_URI || 'mongodb://mongo:27017/chatApp';
   async function connectDB() {
     try {
       await mongoose.connect(DB_URI, {

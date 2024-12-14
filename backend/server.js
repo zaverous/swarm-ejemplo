@@ -16,7 +16,7 @@ const server = http.createServer(app);
 
 const io = require('socket.io')(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: 'http://frontend:5173', //mod
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -32,7 +32,7 @@ connectDB().then(() => {
   console.log("Conexión establecida, iniciando el servidor...");
   // Solo arrancar el servidor después de que la conexión a MongoDB sea exitosa
   app.use(cors({
-    origin: 'http://localhost:5173', // Dirección del frontend
+    origin: 'http://frontend:5173', // Dirección del frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
     allowedHeaders: ['Content-Type', 'Authorization', 'method'], // Encabezados permitidos
     credentials: true // Si necesitas enviar cookies o encabezados de autorización

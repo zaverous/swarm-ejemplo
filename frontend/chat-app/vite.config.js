@@ -6,7 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/socket.io': 'http://localhost:3001',  // Redirigir las solicitudes de socket.io al backend
+      '/api': 'http://backend:3001',
+      '/socket.io': {
+        target: 'http://backend:3001',
+        ws: true, // Permitir WebSockets
+      },
     }
   }
 })

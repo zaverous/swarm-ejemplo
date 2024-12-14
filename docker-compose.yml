@@ -1,0 +1,59 @@
+services:
+  backend:
+    container_name: cimsi-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    networks:
+      cimsi_app_network:
+        aliases:
+          - backend
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/chatApp
+
+  frontend:
+    container_name: cimsi-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    working_dir: /app/chat-app
+    ports:
+      - "5173:5173"
+    networks:
+      cimsi_app_network:
+        aliases:
+          - frontend
+
+  mongo:
+    container_name: mongodb
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    networks:
+      cimsi_app_network:
+        aliases:
+          - mongo
+    volumes:
+      - mongo_data:/data/db
+
+  mongo-seed:
+      build:
+        context: ./mongo-seed
+      depends_on:
+        - mongo
+      networks:
+        cimsi_app_network:
+          aliases:
+            - mongo-seed
+
+volumes:
+  mongo_data: {}
+
+networks:
+  cimsi_app_network:
+    name: cimsi_app_network # Especifica el nombre exacto
+    driver: bridge
