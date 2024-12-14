@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: zaverous/myapp-backend:final
+    image: myapp_backend
     ports:
       - "3001:3001"
     networks:
@@ -15,7 +15,7 @@ services:
       - MONGO_URI=mongodb://mongo:27017/chatApp
 
   frontend:
-    image: zaverous/myapp-frontend:final
+    image: myapp_frontend
     ports:
       - "5173:5173"
     networks:
@@ -39,7 +39,7 @@ services:
         constraints: [node.role == manager]
 
   mongo-seed:
-    image: zaverous/mongo-seed:final
+    image: mongo_seed
     depends_on:
       - mongo
     networks:
@@ -53,3 +53,4 @@ volumes:
 networks:
   cimsi_app_network:
     driver: overlay
+
