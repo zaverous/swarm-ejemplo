@@ -19,7 +19,7 @@ const ChatBox = ({ activeChatId }) => {
       console.log("Cargando mensajes para chatId:", activeChatId);
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`http://localhost:3001/api/Messages?chatId=${activeChatId}`, {
+        const response = await fetch(`http://135.236.97.129/api/Messages?chatId=${activeChatId}`, {
           headers: {
             method: "GET",
             Authorization: `Bearer ${token}`,

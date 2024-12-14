@@ -12,7 +12,7 @@ const Chat = () => {
 
   useEffect(() => {
     // Conectar al servidor de WebSocket
-    const newSocket = io('http://localhost:3001', {
+    const newSocket = io('http://135.236.97.129', {
       transports: ['websocket'],
       withCredentials: true,
     });

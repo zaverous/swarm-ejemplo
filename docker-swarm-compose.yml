@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  backend:
+    image: zaverous/myapp-backend:final
+    ports:
+      - "3001:3001"
+    networks:
+      - cimsi_app_network
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/chatApp
+
+  frontend:
+    image: zaverous/myapp-frontend:final
+    ports:
+      - "5173:5173"
+    networks:
+      - cimsi_app_network
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - cimsi_app_network
+    volumes:
+      - mongo_data:/data/db
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+  mongo-seed:
+    image: zaverous/mongo-seed:final
+    depends_on:
+      - mongo
+    networks:
+      - cimsi_app_network
+    deploy:
+      replicas: 1
+
+volumes:
+  mongo_data:
+
+networks:
+  cimsi_app_network:
+    driver: overlay
