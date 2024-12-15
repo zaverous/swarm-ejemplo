@@ -17,7 +17,7 @@ const authenticate = (req, res, next) => {
   try {
     // Intentamos verificar y decodificar el token
     const decoded = jwt.verify(token, SECRET_KEY);
-
+    console.log('Token decodificado:', decoded);
     // Asignamos el usuario decodificado a req.user
     req.user = decoded;
     // Pasamos al siguiente middleware

@@ -14,6 +14,7 @@ services:
       - mongo
     environment:
       - MONGO_URI=mongodb://mongo:27017/chatApp
+      - CORS_ORIGIN=http://localhost:5173,http://frontend:5173,http://172.18.0.2:5173,http://135.236.97.129
 
   frontend:
     container_name: cimsi-frontend

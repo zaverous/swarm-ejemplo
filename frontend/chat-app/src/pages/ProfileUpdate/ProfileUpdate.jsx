@@ -29,7 +29,7 @@ const ProfileUpdate = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/profile/update', {
+      const response = await fetch('http://135.236.97.129/profile/update', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`, // Enviar token en el encabezado

@@ -7,6 +7,7 @@ const { connectDB } = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const messagesRoutes = require('./routes/messagesRoutes');
+const allowedOrigins = process.env.CORS_ORIGIN.split(',');
 const setupSocket = require('./socket');
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -32,7 +33,13 @@ connectDB().then(() => {
   console.log("Conexión establecida, iniciando el servidor...");
   // Solo arrancar el servidor después de que la conexión a MongoDB sea exitosa
   app.use(cors({
-    origin: 'http://frontend:5173', // Dirección del frontend
+    origin: (origin, callback) => {
+	     // Allow requests with no origin (e.g., mobile apps or curl)
+	    if (!origin || allowedOrigins.includes(origin)) {
+		    return callback(null, true);
+	    }
+	    return callback(new Error('Not allowed by CORS'));
+    },// Dirección del frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
     allowedHeaders: ['Content-Type', 'Authorization', 'method'], // Encabezados permitidos
     credentials: true // Si necesitas enviar cookies o encabezados de autorización
@@ -48,7 +55,7 @@ connectDB().then(() => {
 
   const PORT = 3001;
   server.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`Servidor corriendo en http://135.236.97.129:${PORT}`);
   });
 
   app.use((req, res, next) => {
