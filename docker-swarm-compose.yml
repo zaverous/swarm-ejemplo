@@ -13,6 +13,7 @@ services:
         condition: on-failure
     environment:
       - MONGO_URI=mongodb://mongo:27017/chatApp
+      - CORS_ORIGIN=http://localhost:5173,http://frontend:5173,http://172.18.0.2:5173,http://135.236.97.129
 
   frontend:
     image: myapp_frontend
@@ -24,6 +25,21 @@ services:
       replicas: 3
       restart_policy:
         condition: on-failure
+
+  nginx:
+    image: myapp_nginx 
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Map your custom Nginx config
+    ports:
+      - "80:80"
+    networks:
+      - cimsi_app_network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
 
   mongo:
     image: mongo:latest
